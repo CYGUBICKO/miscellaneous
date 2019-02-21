@@ -1,0 +1,44 @@
+---
+title: 'Split a multiple response entries column in a dataframe'
+author: "Steve Cygu ([cygubicko@gmail.com](mailto:cygubicko@gmail.com))"
+date: "2019 Feb 21 (Thu)"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 5
+    toc_float: yes
+---
+
+```{r setup, include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(echo = FALSE
+	, warning = FALSE
+	, message = FALSE
+	, fig.width = 10
+	, fig.height = 10
+	, results = "asis")
+options(width = 12)
+library(ggplot2)
+#library(plotly)
+#library(gapminder)
+#library("papeR")
+library(DT)
+library(dplyr)
+library(pander)
+
+theme_set(theme_bw() +
+	theme(panel.spacing=grid::unit(0,"lines")))
+```
+
+# Problem
+
+In many data collection software, multiple response questions' selections (respondent can choose more than one option) are usually stored in a single cell separated with some characters. This problem is mostly common in _ODK_ and other _ODK_ based tools. In addition, a more general problem could be creating columns from a single column of a dataframe based on some pattern.
+
+# Possible solution(s) approaches
+
+* Split columns in excel
+
+* Use R functions
+
+In this document, we will show a step by step guide on how to write a R function which will be able to do the job.
+
