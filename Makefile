@@ -19,7 +19,7 @@ $(ms)/Makefile:
 Sources += datasets
 
 subdirs += data_mgt
-Ignore += $(subdirs) multi_resp_description.csv 
+Ignore += $(subdirs) datasets/multi_resp_description.csv 
 
 ######################################################################
 
