@@ -16,7 +16,7 @@ $(ms)/Makefile:
 
 ######################################################################
 
-Sources += datasets/multi_response.csv
+Sources += datasets/multi_response.csv data_mgt
 
 ## subdirs += data_mgt
 ## Ignore += $(subdirs)
