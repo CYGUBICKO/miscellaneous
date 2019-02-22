@@ -28,7 +28,7 @@ $(ms)/Makefile:
 
 ######################################################################
 
-Ignore += data docs
+Ignore += multi_response.csv
 
 Sources += $(wildcard *.R *.rmd)
 
