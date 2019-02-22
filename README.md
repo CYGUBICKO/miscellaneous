@@ -2,5 +2,5 @@
 
 This is a collection of scripts to solve some particular problem(s). Some could be thinking process through ideas or otherwise!!!
 
-* 1. [Split multiple response column](https://cygubicko.github.io/miscellaneous/separate_entries.html)
+* [Split multiple response column](https://cygubicko.github.io/miscellaneous/separate_entries.html)
 
