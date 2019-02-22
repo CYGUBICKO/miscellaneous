@@ -1,5 +1,5 @@
 ---
-title: 'Split a multiple response entries column in a dataframe'
+title: 'Split multiple response entry column(s)'
 author: "Steve Cygu ([cygubicko@gmail.com](mailto:cygubicko@gmail.com))"
 date: "2019 Feb 21 (Thu)"
 output:
@@ -18,29 +18,49 @@ knitr::opts_chunk$set(echo = FALSE
 	, fig.height = 10
 	, results = "asis")
 options(width = 12)
-library(ggplot2)
-#library(plotly)
-#library(gapminder)
-#library("papeR")
+```
+
+# Setup
+
+We begin by loading the required packages. If you don't have the packages installed, use `install.packages("package_name")`.
+
+```{r, echo = TRUE}
 library(DT)
 library(dplyr)
-library(pander)
-
-theme_set(theme_bw() +
-	theme(panel.spacing=grid::unit(0,"lines")))
 ```
+
 
 # Problem
 
 In many data collection software, multiple response questions' selections (respondent can choose more than one option) are usually stored in a single cell separated with some characters. This problem is mostly common in _ODK_ and other _ODK_ based tools or even Google Forms. In addition, a more general problem could be creating columns from a single column of a dataframe based on some pattern.
 
-Let us take a look at the data.
+To demonstrate how we go about this, we use [social media survey data](https://github.com/CYGUBICKO/miscellaneous/tree/master/datasets) in which reposndents were asked which social media they use. Let us take a look at the variables.
 
-# Possible solution(s) approaches
+```{r}
+desc <- read.csv("../datasets/multi_resp_desc.csv")
+datatable(desc, rownames = FALSE)
+```
+
+In this example, the respondents could have selected more than one social media platforms (see **smedia\_used**). The selected oprions are seperated using "," and our aim is to create additional variables to hold each of the selected responses. Let us take a look at the data
+
+```{r, echo = TRUE}
+smedia_df <- read.csv("../datasets/multi_response.csv")
+datatable(head(smedia_df), rownames = FALSE)
+```
+
+Some of the ways to solve thus problem may include:
 
 * Split columns in excel
 
 * Use R functions
 
-In this document, we will show a step by step guide on how to write a R function which will be able to do the job.
+In this post, we will show a step by step guide on how to write a R function which will be able to do the job.
 
+
+# R way
+
+As mentioned above, we are going to demonstrate this using **smedia\_used** variable. We would therefore ask ourselves how much information do we have:
+
+|What we see | What R will understand | Comment |
+|------- | ------- | -------------|","			 | pattern					  | This can be any pattern ("-", "space",...) dependeing on the plattform/problem.
+|Individual entries in **smedia\_used** | Number of new variables to create | Number of new variables to be created equals max(number of entries).
