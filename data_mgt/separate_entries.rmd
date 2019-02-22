@@ -62,5 +62,6 @@ In this post, we will show a step by step guide on how to write a R function whi
 As mentioned above, we are going to demonstrate this using **smedia\_used** variable. We would therefore ask ourselves how much information do we have:
 
 |What we see | What R will understand | Comment |
-|------- | ------- | -------------|","			 | pattern					  | This can be any pattern ("-", "space",...) dependeing on the plattform/problem.
-|Individual entries in **smedia\_used** | Number of new variables to create | Number of new variables to be created equals max(number of entries).
+|------- | ------- | -------------|
+|","     | pattern | This can be any pattern ("-", "space",...) dependeing on the plattform/problem.| 
+|Individual entries in **smedia\_used** | Number of new variables to create | Number of new variables to be created equals max(number of entries).|
