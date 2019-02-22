@@ -1,7 +1,0 @@
-variable,description
-doi,1. Date of interview
-gender,2. What is your gender?
-age,3. How old are you?
-smedia_used,4. What social media platforms do you use regularly? (Select all that apply)
-freq_usage,"5. If you selected that you use Twitter, how often do you read Twitter content? (Select one)"
-freq_post,"6. If you selected that you use Twitter, how often do you post to Twitter?"
