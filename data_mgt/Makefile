@@ -28,8 +28,6 @@ $(ms)/Makefile:
 
 ######################################################################
 
-Ignore += multi_response.csv
-
 Sources += $(wildcard *.R *.rmd)
 
 
