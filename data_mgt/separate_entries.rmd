@@ -1,17 +1,18 @@
 ---
-title: 'Split multiple response entry column(s)'
+title: 'Split multiple response entry column(s) in R'
 author: "Steve Cygu ([cygubicko@gmail.com](mailto:cygubicko@gmail.com))"
 date: "2019 Feb 21 (Thu)"
 output:
   html_document:
-    number_sections: yes
-    toc: yes
-    toc_depth: 5
-    toc_float: yes
+   code_folding: hide
+   number_sections: yes
+   toc: yes
+   toc_depth: 5
+   toc_float: yes
 ---
 
 ```{r setup, include=FALSE, cache=FALSE}
-knitr::opts_chunk$set(echo = FALSE
+knitr::opts_chunk$set(echo = TRUE
 	, warning = FALSE
 	, message = FALSE
 	, fig.width = 10
@@ -59,9 +60,53 @@ In this post, we will show a step by step guide on how to write a R function whi
 
 # R way
 
-As mentioned above, we are going to demonstrate this using **smedia\_used** variable. We would therefore ask ourselves how much information do we have:
+As mentioned above, we are going to demonstrate this using **smedia\_used** variable. We would therefore ask ourselves how much information do we have and best can use such?
 
 |What we see | What R will understand | Comment |
 |------- | ------- | -------------|
 |","     | pattern | This can be any pattern ("-", "space",...) dependeing on the plattform/problem.| 
 |Individual entries in **smedia\_used** | Number of new variables to create | Number of new variables to be created equals max(number of entries).|
+----------------------------------------------------------------------
+ 
+
+First we need to understand how pattern matching and regular expressions work in R. You can find some help online but I would recommend [Regular Expressions in R](https://rstudio-pubs-static.s3.amazonaws.com/74603_76cd14d5983f47408fdf0b323550b846.html) or [Pattern Matching and Replacement](http://astrostatistics.psu.edu/su07/R/html/base/html/grep.html) as a starting point.
+
+We need to count the number of selections in **smedia\_used** based on the pattern ",".
+
+```{r, echo = TRUE}
+countFunc <- function(x, pattern){
+	nselect <- sapply(gregexpr(pattern, x), length) + 1
+	return(nselect)
+}
+```
+* _x_ - input variable (could be multiple response)
+* _pattern_ - what separates the entries. Could be ",", "_" ....
+* _gregexpr()_ - Searches for the pattern and returns the position if TRUE.
+* _sapply_ - tells R to 'repeatedly' search for the pattern and do something - _length_.
+* _length_ - what _sapply_ does. Counts the number of patterns found.
+* _+1_ - counting only happens if there is more than one entry. This accounts for first selection.
+
+Let us test the `countFunc`.
+
+```{r, echo = TRUE}
+test_vec <- c("first, second, third", "fourth", "second, fifth")
+pattern <- ","
+countFunc(test_vec, pattern)
+```
+
+```{r, echo = TRUE}
+pattern <- ","
+smedia_df <- (smedia_df
+	%>% mutate(num_select = sum(grepl(pattern, smedia_used, ignore.case = TRUE)) + 1)
+)
+```
+
+* `grepl()` above looks for the pattern and then returns _TRUE_ or _FALSE_. We then sum to count the number of occurances and then add $1$ to take care of at least a single selection. Let us take a look:
+
+```{r, echo = TRUE}
+count_df <- (smedia_df
+	%>% select(smedia_used, num_select)
+	%>% datatable(rownames = FALSE)
+)
+count_df
+```

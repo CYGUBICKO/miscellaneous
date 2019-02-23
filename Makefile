@@ -16,6 +16,7 @@ $(ms)/Makefile:
 
 ######################################################################
 
+Sources += $(wildcard *.yml *.md)
 Sources += datasets/multi_response.csv
 
 subdirs += data_mgt
