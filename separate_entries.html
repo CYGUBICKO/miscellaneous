@@ -1260,6 +1260,66 @@ window.buildTabsets = function(tocID) {
 };
 
 </script>
+<script>
+window.initializeCodeFolding = function(show) {
+
+  // handlers for show-all and hide all
+  $("#rmd-show-all-code").click(function() {
+    $('div.r-code-collapse').each(function() {
+      $(this).collapse('show');
+    });
+  });
+  $("#rmd-hide-all-code").click(function() {
+    $('div.r-code-collapse').each(function() {
+      $(this).collapse('hide');
+    });
+  });
+
+  // index for unique code element ids
+  var currentIndex = 1;
+
+  // select all R code blocks
+  var rCodeBlocks = $('pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan');
+  rCodeBlocks.each(function() {
+
+    // create a collapsable div to wrap the code in
+    var div = $('<div class="collapse r-code-collapse"></div>');
+    if (show)
+      div.addClass('in');
+    var id = 'rcode-643E0F36' + currentIndex++;
+    div.attr('id', id);
+    $(this).before(div);
+    $(this).detach().appendTo(div);
+
+    // add a show code button right above
+    var showCodeText = $('<span>' + (show ? 'Hide' : 'Code') + '</span>');
+    var showCodeButton = $('<button type="button" class="btn btn-default btn-xs code-folding-btn pull-right"></button>');
+    showCodeButton.append(showCodeText);
+    showCodeButton
+        .attr('data-toggle', 'collapse')
+        .attr('data-target', '#' + id)
+        .attr('aria-expanded', show)
+        .attr('aria-controls', id);
+
+    var buttonRow = $('<div class="row"></div>');
+    var buttonCol = $('<div class="col-md-12"></div>');
+
+    buttonCol.append(showCodeButton);
+    buttonRow.append(buttonCol);
+
+    div.before(buttonRow);
+
+    // update state of button on show/hide
+    div.on('hidden.bs.collapse', function () {
+      showCodeText.text('Code');
+    });
+    div.on('show.bs.collapse', function () {
+      showCodeText.text('Hide');
+    });
+  });
+
+}
+</script>
 <style type="text/css">.hljs-literal {
 color: #990073;
 }
@@ -3671,6 +3731,14 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 
 
@@ -3773,6 +3841,14 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Split multiple response entry column(s) in R</h1>
@@ -3792,13 +3868,15 @@ library(dplyr)</code></pre>
 <h1><span class="header-section-number">2</span> Problem</h1>
 <p>In many data collection software, multiple response questions’ selections (respondent can choose more than one option) are usually stored in a single cell separated with some characters. This problem is mostly common in <em>ODK</em> and other <em>ODK</em> based tools or even Google Forms. In addition, a more general problem could be creating columns from a single column of a dataframe based on some pattern.</p>
 <p>To demonstrate how we go about this, we use <a href="https://github.com/CYGUBICKO/miscellaneous/tree/master/datasets">social media survey data</a> in which reposndents were asked which social media they use. Let us take a look at the variables.</p>
-<div id="htmlwidget-e54b9d0c5e14c29711b6" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e54b9d0c5e14c29711b6">{"x":{"filter":"none","data":[["doi","gender","age","smedia_used","freq_usage","freq_post"],["1. Date of interview","2. What is your gender?","3. How old are you?","4. What social media platforms do you use regularly? (Select all that apply)","5. If you selected that you use Twitter, how often do you read Twitter content? (Select one)","6. If you selected that you use Twitter, how often do you post to Twitter?"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>variable<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>desc &lt;- read.csv(&quot;../datasets/multi_resp_desc.csv&quot;)
+datatable(desc, rownames = FALSE)</code></pre>
+<div id="htmlwidget-5df8f1216147a0060f5f" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5df8f1216147a0060f5f">{"x":{"filter":"none","data":[["doi","gender","age","smedia_used","freq_usage","freq_post"],["1. Date of interview","2. What is your gender?","3. How old are you?","4. What social media platforms do you use regularly? (Select all that apply)","5. If you selected that you use Twitter, how often do you read Twitter content? (Select one)","6. If you selected that you use Twitter, how often do you post to Twitter?"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>variable<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>In this example, the respondents could have selected more than one social media platforms (see <strong>smedia_used</strong>). The selected oprions are seperated using “,” and our aim is to create additional variables to hold each of the selected responses. Let us take a look at the data</p>
 <pre class="r"><code>smedia_df &lt;- read.csv(&quot;../datasets/multi_response.csv&quot;)
 datatable(head(smedia_df), rownames = FALSE)</code></pre>
-<div id="htmlwidget-4c2e78d6f2f4d836eea5" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4c2e78d6f2f4d836eea5">{"x":{"filter":"none","data":[["5/24/2018 3:59:02","5/24/2018 4:15:47","5/24/2018 4:17:32","5/24/2018 4:25:25","5/24/2018 4:41:11","5/24/2018 10:16:17"],["Male","Male","Female","Male","Female","Female"],[24,23,19,25,25,23],["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp"],["A few times a month","Multiple times a day","Multiple times a day","Never","A few times a week","Multiple times a day"],["A few times a month","Rarely","Rarely","Never","Rarely","Rarely"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>doi<\/th>\n      <th>gender<\/th>\n      <th>age<\/th>\n      <th>smedia_used<\/th>\n      <th>freq_usage<\/th>\n      <th>freq_post<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-a08d71f432292afb04de" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a08d71f432292afb04de">{"x":{"filter":"none","data":[["5/24/2018 3:59:02","5/24/2018 4:15:47","5/24/2018 4:17:32","5/24/2018 4:25:25","5/24/2018 4:41:11","5/24/2018 10:16:17"],["Male","Male","Female","Male","Female","Female"],[24,23,19,25,25,23],["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp"],["A few times a month","Multiple times a day","Multiple times a day","Never","A few times a week","Multiple times a day"],["A few times a month","Rarely","Rarely","Never","Rarely","Rarely"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>doi<\/th>\n      <th>gender<\/th>\n      <th>age<\/th>\n      <th>smedia_used<\/th>\n      <th>freq_usage<\/th>\n      <th>freq_post<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>Some of the ways to solve thus problem may include:</p>
 <ul>
 <li><p>Split columns in excel</p></li>
@@ -3867,8 +3945,8 @@ smedia_df &lt;- (smedia_df
     %&gt;% datatable(rownames = FALSE)
 )
 count_df</code></pre>
-<div id="htmlwidget-bb34a97533fb7ed6a206" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-bb34a97533fb7ed6a206">{"x":{"filter":"none","data":[["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Whatsapp","Twitter, Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Pinterest, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Facebook, Whatsapp","Twitter, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Instagram, Pinterest, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Pinterest, Whatsapp, Viber","Twitter, Facebook, Instagram, Pinterest, Whatsapp","Facebook, Whatsapp","Facebook, Whatsapp"],[36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>smedia_used<\/th>\n      <th>num_select<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-b9bdc9e859a8cf7797b4" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b9bdc9e859a8cf7797b4">{"x":{"filter":"none","data":[["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Whatsapp","Twitter, Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Pinterest, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Facebook, Whatsapp","Twitter, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Instagram, Pinterest, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Pinterest, Whatsapp, Viber","Twitter, Facebook, Instagram, Pinterest, Whatsapp","Facebook, Whatsapp","Facebook, Whatsapp"],[36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>smedia_used<\/th>\n      <th>num_select<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 
 
