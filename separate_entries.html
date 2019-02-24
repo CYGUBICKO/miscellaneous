@@ -3870,13 +3870,13 @@ library(dplyr)</code></pre>
 <p>To demonstrate how we go about this, we use <a href="https://github.com/CYGUBICKO/miscellaneous/tree/master/datasets">social media survey data</a> in which reposndents were asked which social media they use. Let us take a look at the variables.</p>
 <pre class="r"><code>desc &lt;- read.csv(&quot;../datasets/multi_resp_desc.csv&quot;)
 datatable(desc, rownames = FALSE)</code></pre>
-<div id="htmlwidget-dc13e24c59007bc4be48" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-dc13e24c59007bc4be48">{"x":{"filter":"none","data":[["doi","gender","age","smedia_used","freq_usage","freq_post"],["1. Date of interview","2. What is your gender?","3. How old are you?","4. What social media platforms do you use regularly? (Select all that apply)","5. If you selected that you use Twitter, how often do you read Twitter content? (Select one)","6. If you selected that you use Twitter, how often do you post to Twitter?"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>variable<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-9b29287dc8f9f6636ef9" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9b29287dc8f9f6636ef9">{"x":{"filter":"none","data":[["doi","gender","age","smedia_used","freq_usage","freq_post"],["1. Date of interview","2. What is your gender?","3. How old are you?","4. What social media platforms do you use regularly? (Select all that apply)","5. If you selected that you use Twitter, how often do you read Twitter content? (Select one)","6. If you selected that you use Twitter, how often do you post to Twitter?"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>variable<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>In this example, the respondents could have selected more than one social media platforms (see <strong>smedia_used</strong>). The selected oprions are seperated using “,” and our aim is to create additional variables to hold each of the selected responses. Let us take a look at the data</p>
 <pre class="r"><code>smedia_df &lt;- read.csv(&quot;../datasets/multi_response.csv&quot;)
 datatable(head(smedia_df), rownames = FALSE)</code></pre>
-<div id="htmlwidget-ba3820c428fe3ec33d0f" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ba3820c428fe3ec33d0f">{"x":{"filter":"none","data":[["5/24/2018 3:59:02","5/24/2018 4:15:47","5/24/2018 4:17:32","5/24/2018 4:25:25","5/24/2018 4:41:11","5/24/2018 10:16:17"],["Male","Male","Female","Male","Female","Female"],[24,23,19,25,25,23],["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp"],["A few times a month","Multiple times a day","Multiple times a day","Never","A few times a week","Multiple times a day"],["A few times a month","Rarely","Rarely","Never","Rarely","Rarely"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>doi<\/th>\n      <th>gender<\/th>\n      <th>age<\/th>\n      <th>smedia_used<\/th>\n      <th>freq_usage<\/th>\n      <th>freq_post<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-bd816ef57152a5961311" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-bd816ef57152a5961311">{"x":{"filter":"none","data":[["5/24/2018 3:59:02","5/24/2018 4:15:47","5/24/2018 4:17:32","5/24/2018 4:25:25","5/24/2018 4:41:11","5/24/2018 10:16:17"],["Male","Male","Female","Male","Female","Female"],[24,23,19,25,25,23],["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp"],["A few times a month","Multiple times a day","Multiple times a day","Never","A few times a week","Multiple times a day"],["A few times a month","Rarely","Rarely","Never","Rarely","Rarely"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>doi<\/th>\n      <th>gender<\/th>\n      <th>age<\/th>\n      <th>smedia_used<\/th>\n      <th>freq_usage<\/th>\n      <th>freq_post<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>Some of the ways to solve thus problem may include:</p>
 <ul>
 <li><p>Split columns in excel</p></li>
@@ -3917,22 +3917,22 @@ datatable(head(smedia_df), rownames = FALSE)</code></pre>
 <p>First we need to understand how pattern matching and regular expressions work in R. You can find some help online but I would recommend <a href="https://rstudio-pubs-static.s3.amazonaws.com/74603_76cd14d5983f47408fdf0b323550b846.html">Regular Expressions in R</a> or <a href="http://astrostatistics.psu.edu/su07/R/html/base/html/grep.html">Pattern Matching and Replacement</a> as a starting point.</p>
 <p>We need to count the number of selections in <strong>smedia_used</strong> based on the pattern “,”.</p>
 <pre class="r"><code>countFunc &lt;- function(x, pattern){
-    nselect &lt;- sapply(gregexpr(pattern, x), length) + 1
+    nselect &lt;- sapply(regmatches(x, gregexpr(pattern, x)), length) + 1
     return(nselect)
 }</code></pre>
 <ul>
 <li><em>x</em> - input variable (could be multiple response)</li>
-<li><em>pattern</em> - what separates the entries. Could be “,”, &quot;_&quot; ….</li>
-<li><em>gregexpr()</em> - Searches for the pattern and returns the position if TRUE.</li>
+<li><em>pattern</em> - what separates the entries. Could be “,”, “_” ….</li>
+<li><em>gregexpr()</em> and <em>regmatches()</em> - Searches for the pattern and returns the position if TRUE.</li>
 <li><em>sapply</em> - tells R to ‘repeatedly’ search for the pattern and do something - <em>length</em>.</li>
 <li><em>length</em> - what <em>sapply</em> does. Counts the number of patterns found.</li>
 <li><em>+1</em> - counting only happens if there is more than one entry. This accounts for first selection.</li>
 </ul>
 <p>Let us test the <code>countFunc</code>.</p>
 <pre class="r"><code>test_vec &lt;- c(&quot;first, second, third&quot;, &quot;fourth&quot;, &quot;second, fifth&quot;)
-pattern &lt;- &quot;,&quot;
+pattern &lt;- &quot;\\,+&quot;
 countFunc(test_vec, pattern)</code></pre>
-<p>[1] 3 2 2</p>
+<p>[1] 3 1 2</p>
 <pre class="r"><code>pattern &lt;- &quot;,&quot;
 smedia_df &lt;- (smedia_df
     %&gt;% mutate(num_select = sum(grepl(pattern, smedia_used, ignore.case = TRUE)) + 1)
@@ -3945,8 +3945,8 @@ smedia_df &lt;- (smedia_df
     %&gt;% datatable(rownames = FALSE)
 )
 count_df</code></pre>
-<div id="htmlwidget-cb6c0770d2861798cf41" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-cb6c0770d2861798cf41">{"x":{"filter":"none","data":[["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Whatsapp","Twitter, Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Pinterest, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Facebook, Whatsapp","Twitter, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Instagram, Pinterest, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Pinterest, Whatsapp, Viber","Twitter, Facebook, Instagram, Pinterest, Whatsapp","Facebook, Whatsapp","Facebook, Whatsapp"],[36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>smedia_used<\/th>\n      <th>num_select<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-c6f28048953bab092136" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c6f28048953bab092136">{"x":{"filter":"none","data":[["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Whatsapp","Twitter, Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Pinterest, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Facebook, Whatsapp","Twitter, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Instagram, Pinterest, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Pinterest, Whatsapp, Viber","Twitter, Facebook, Instagram, Pinterest, Whatsapp","Facebook, Whatsapp","Facebook, Whatsapp"],[36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>smedia_used<\/th>\n      <th>num_select<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 
 
