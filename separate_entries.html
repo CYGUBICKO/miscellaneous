@@ -3870,13 +3870,13 @@ library(dplyr)</code></pre>
 <p>To demonstrate how we go about this, we use <a href="https://github.com/CYGUBICKO/miscellaneous/tree/master/datasets">social media survey data</a> in which reposndents were asked which social media they use. Let us take a look at the variables.</p>
 <pre class="r"><code>desc &lt;- read.csv(&quot;../datasets/multi_resp_desc.csv&quot;)
 datatable(desc, rownames = FALSE)</code></pre>
-<div id="htmlwidget-9b29287dc8f9f6636ef9" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-9b29287dc8f9f6636ef9">{"x":{"filter":"none","data":[["doi","gender","age","smedia_used","freq_usage","freq_post"],["1. Date of interview","2. What is your gender?","3. How old are you?","4. What social media platforms do you use regularly? (Select all that apply)","5. If you selected that you use Twitter, how often do you read Twitter content? (Select one)","6. If you selected that you use Twitter, how often do you post to Twitter?"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>variable<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-3b8330bae42b2fa06f93" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3b8330bae42b2fa06f93">{"x":{"filter":"none","data":[["doi","gender","age","smedia_used","freq_usage","freq_post"],["1. Date of interview","2. What is your gender?","3. How old are you?","4. What social media platforms do you use regularly? (Select all that apply)","5. If you selected that you use Twitter, how often do you read Twitter content? (Select one)","6. If you selected that you use Twitter, how often do you post to Twitter?"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>variable<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>In this example, the respondents could have selected more than one social media platforms (see <strong>smedia_used</strong>). The selected oprions are seperated using “,” and our aim is to create additional variables to hold each of the selected responses. Let us take a look at the data</p>
 <pre class="r"><code>smedia_df &lt;- read.csv(&quot;../datasets/multi_response.csv&quot;)
 datatable(head(smedia_df), rownames = FALSE)</code></pre>
-<div id="htmlwidget-bd816ef57152a5961311" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-bd816ef57152a5961311">{"x":{"filter":"none","data":[["5/24/2018 3:59:02","5/24/2018 4:15:47","5/24/2018 4:17:32","5/24/2018 4:25:25","5/24/2018 4:41:11","5/24/2018 10:16:17"],["Male","Male","Female","Male","Female","Female"],[24,23,19,25,25,23],["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp"],["A few times a month","Multiple times a day","Multiple times a day","Never","A few times a week","Multiple times a day"],["A few times a month","Rarely","Rarely","Never","Rarely","Rarely"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>doi<\/th>\n      <th>gender<\/th>\n      <th>age<\/th>\n      <th>smedia_used<\/th>\n      <th>freq_usage<\/th>\n      <th>freq_post<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-9569a7aee1cdb75ba7c5" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9569a7aee1cdb75ba7c5">{"x":{"filter":"none","data":[["5/24/2018 3:59:02","5/24/2018 4:15:47","5/24/2018 4:17:32","5/24/2018 4:25:25","5/24/2018 4:41:11","5/24/2018 10:16:17"],["Male","Male","Female","Male","Female","Female"],[24,23,19,25,25,23],["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp"],["A few times a month","Multiple times a day","Multiple times a day","Never","A few times a week","Multiple times a day"],["A few times a month","Rarely","Rarely","Never","Rarely","Rarely"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>doi<\/th>\n      <th>gender<\/th>\n      <th>age<\/th>\n      <th>smedia_used<\/th>\n      <th>freq_usage<\/th>\n      <th>freq_post<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>Some of the ways to solve thus problem may include:</p>
 <ul>
 <li><p>Split columns in excel</p></li>
@@ -3930,23 +3930,14 @@ datatable(head(smedia_df), rownames = FALSE)</code></pre>
 </ul>
 <p>Let us test the <code>countFunc</code>.</p>
 <pre class="r"><code>test_vec &lt;- c(&quot;first, second, third&quot;, &quot;fourth&quot;, &quot;second, fifth&quot;)
-pattern &lt;- &quot;\\,+&quot;
+pattern &lt;- &quot;,&quot;
 countFunc(test_vec, pattern)</code></pre>
-<p>[1] 3 1 2</p>
-<pre class="r"><code>pattern &lt;- &quot;,&quot;
-smedia_df &lt;- (smedia_df
-    %&gt;% mutate(num_select = sum(grepl(pattern, smedia_used, ignore.case = TRUE)) + 1)
-)</code></pre>
-<ul>
-<li><code>grepl()</code> above looks for the pattern and then returns <em>TRUE</em> or <em>FALSE</em>. We then sum to count the number of occurances and then add <span class="math inline">\(1\)</span> to take care of at least a single selection. Let us take a look:</li>
-</ul>
-<pre class="r"><code>count_df &lt;- (smedia_df
-    %&gt;% select(smedia_used, num_select)
-    %&gt;% datatable(rownames = FALSE)
-)
-count_df</code></pre>
-<div id="htmlwidget-c6f28048953bab092136" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c6f28048953bab092136">{"x":{"filter":"none","data":[["Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Whatsapp","Twitter, Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Facebook, Instagram, Whatsapp","Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook","Twitter, Facebook, Whatsapp","Twitter, Instagram, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Pinterest, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Facebook, Whatsapp","Facebook, Whatsapp","Twitter, Whatsapp","Facebook, Whatsapp","Twitter, Facebook, Whatsapp","Twitter, Facebook, Instagram, Pinterest, Whatsapp","Twitter, Facebook, Instagram, Whatsapp","Twitter, Facebook, Instagram, Pinterest, Whatsapp, Viber","Twitter, Facebook, Instagram, Pinterest, Whatsapp","Facebook, Whatsapp","Facebook, Whatsapp"],[36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>smedia_used<\/th>\n      <th>num_select<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p>[1] 3 1 2 We’ve correctly counted the entries in <em>test</em><span class="math inline">\(\_\)</span><em>vec</em></p>
+<pre class="r"><code>#count_df &lt;- (smedia_df
+#   %&gt;% select(smedia_used, num_select)
+#   %&gt;% datatable(rownames = FALSE)
+#)
+#count_df</code></pre>
 </div>
 
 
