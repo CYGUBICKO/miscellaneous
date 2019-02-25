@@ -4,7 +4,7 @@ author: "Steve Cygu ([cygubicko@gmail.com](mailto:cygubicko@gmail.com))"
 date: "2019 Feb 21 (Thu)"
 output:
   html_document:
-   code_folding: hide
+   code_folding: show
    number_sections: yes
    toc: yes
    toc_depth: 5
@@ -28,6 +28,7 @@ We begin by loading the required packages. If you don't have the packages instal
 ```{r, echo = TRUE}
 library(DT)
 library(dplyr)
+library(tidyr)
 ```
 
 
@@ -74,39 +75,155 @@ First we need to understand how pattern matching and regular expressions work in
 We need to count the number of selections in **smedia\_used** based on the pattern ",".
 
 ```{r, echo = TRUE}
-countFunc <- function(x, pattern){
-	nselect <- sapply(gregexpr(pattern, x), length) + 1
+countFunc <- function(var, pattern){
+	nselect <- sapply(regmatches(var, gregexpr(pattern, var)), length) + 1
 	return(nselect)
 }
 ```
-* _x_ - input variable (could be multiple response)
-* _pattern_ - what separates the entries. Could be ",", "_" ....
-* _gregexpr()_ - Searches for the pattern and returns the position if TRUE.
-* _sapply_ - tells R to 'repeatedly' search for the pattern and do something - _length_.
-* _length_ - what _sapply_ does. Counts the number of patterns found.
-* _+1_ - counting only happens if there is more than one entry. This accounts for first selection.
+
+* `var` - input variable (could be multiple response)
+* `pattern` - what separates the entries. Could be ",", "\_" ....
+* `gregexpr()` and `regmatches()` - Searches for the pattern and returns the position if TRUE.
+* `sapply` - tells R to 'repeatedly' search for the pattern and do something - _length_.
+* `length` - what _sapply_ does. Counts the number of patterns found.
+* `+1` - counting only happens if there is more than one entry. This accounts for first selection.
 
 Let us test the `countFunc`.
-
 ```{r, echo = TRUE}
 test_vec <- c("first, second, third", "fourth", "second, fifth")
 pattern <- ","
 countFunc(test_vec, pattern)
 ```
 
+We've correctly counted the entries in _test_$\_$_vec_. Now let us apply the function, `countFunc()`, to our dataset.
+
 ```{r, echo = TRUE}
+x <- pull(smedia_df, "smedia_used")
 pattern <- ","
-smedia_df <- (smedia_df
-	%>% mutate(num_select = sum(grepl(pattern, smedia_used, ignore.case = TRUE)) + 1)
+nselected <- countFunc(x, pattern) # Count the number of entries
+
+# Add this column to the dataset
+smedia_df2 <- (smedia_df
+   %>% mutate(nselected = nselected)
 )
+datatable(smedia_df2, rownames = FALSE)
 ```
 
-* `grepl()` above looks for the pattern and then returns _TRUE_ or _FALSE_. We then sum to count the number of occurances and then add $1$ to take care of at least a single selection. Let us take a look:
+The last column in the output above correctly counts the number of selections in **smedia**\_**df**. We now modify `countFunc()` to perform all the tasks above and add a few lines to split the multiple responses into new columns.
 
 ```{r, echo = TRUE}
-count_df <- (smedia_df
-	%>% select(smedia_used, num_select)
-	%>% datatable(rownames = FALSE)
-)
-count_df
+countFunc <- function(df, var, pattern, remove = FALSE, drop_ns = FALSE){
+	nselected <- paste0(var, "_nselected")
+	df <- (df
+		%>% rename(temp_multi = var)
+		%>% mutate(temp_nselected = sapply(
+				regmatches(temp_multi, gregexpr(pattern, temp_multi))
+				, length
+			) + 1
+		)
+	)
+	# Max number of new variables to create
+	maxselected <- max(pull(df, temp_nselected))
+
+	# Create the new variable
+	df <- (df 
+		%>% separate_("temp_multi"
+			, c(paste0(rep(var, maxselected), "_", 1:maxselected))
+			, sep = pattern
+			, remove = remove
+			, convert = TRUE
+		)
+		%>% rename_(.dots = setNames(c("temp_multi", "temp_nselected"), c(var, nselected)))
+	)
+	if(drop_ns){
+		df <- select(df, -c(grep("_nselected$", colnames(df), value = TRUE)))
+	}
+	return(df)
+}
 ```
+
+This function might look complicated but not at all...! 
+
+* `var` and `pattern` - same as above.
+* `remove = TRUE` - drops the parent multiple response variable.
+* `drop_ns` - whether to create a variable for the number of selections per case. Naming is of the form `varname_nselected`.
+* `mutate()` - counts the number of selected reponses and then create a temporary variable, `temp_nselected`.
+* `separate()` - based on the pattern and the maximum number of selections made, this line creates new columns immediately after the multiple variable. The created variables keeps same variable name with "\_" number.
+
+Let us take a look at the output
+
+```{r, echo = TRUE}
+smedia_df3 <- (smedia_df
+	%>% countFunc(var = "smedia_used", pattern = ",", remove = FALSE, drop_ns = FALSE)
+	%>% datatable(., rownames = FALSE, options = list(scrollX = TRUE))
+)
+smedia_df3
+```
+
+* Try `remove = TRUE` and/or `drop_ns = TRUE`.
+
+Technically, we've achieved our aim; counted the selections and managed to create individual variables. However, we can put everything together and make our function more robust.
+
+## Everything together
+
+Suppose we want to split several variable? Of course we can simply do a `for loop` but it would be much better if we implemented that in `countFunc` so that we don't have think about _how to_ and maybe give it a different name like `multiSeparate`.
+
+```{r, echo = TRUE}
+multiSeparate <- function(df, vars, pattern, remove = FALSE, drop_ns = FALSE){
+	for (var in vars){
+		nselected <- paste0(var, "_nselected")
+		df <- (df
+			%>% rename(temp_multi = var)
+			%>% mutate(temp_nselected = sapply(
+					regmatches(temp_multi, gregexpr(pattern, temp_multi))
+					, length
+				) + 1
+			)
+		)
+		# Max number of new variables to create
+		maxselected <- max(pull(df, temp_nselected))
+
+		# Create the new variable
+		df <- (df 
+			%>% separate_("temp_multi"
+				, c(paste0(rep(var, maxselected), "_", 1:maxselected))
+				, sep = pattern
+				, remove = remove
+				, convert = TRUE
+			)
+			%>% rename_(.dots = setNames(c("temp_multi", "temp_nselected"), c(var, nselected)))
+		)
+		if(drop_ns){
+			df <- select(df, -c(grep("_nselected$", colnames(df), value = TRUE)))
+		}
+	}
+	return(df)
+}
+```
+
+* We only added 2 lines and changed one input. Your guess is as good as mine.
+
+Test our function we create $3$ additional dummy multiple variables with different separation patterns.
+
+```{r, echo = TRUE}
+smedia_df <- (smedia_df
+ %>% mutate(smedia_used_dummy1 = smedia_used
+ 		, smedia_used_dummy2 = gsub(",", "-", smedia_used)
+ 		, smedia_used_dummy3 = gsub(",", " ", smedia_used)
+ )
+)
+
+multi_vars <- grep("^smedia_used", colnames(smedia_df), value = TRUE)
+print("All multiple respnse variables")
+multi_vars
+```
+
+```{r, echo = TRUE}
+smedia_df <- (smedia_df
+	%>% multiSeparate(vars = multi_vars, pattern = ",| |-", remove = FALSE, drop_ns = FALSE)
+	%>% datatable(., rownames = FALSE, options = list(scrollX = TRUE))
+)
+smedia_df
+```
+
+You can download the function from [here]() or markdown file from [here]()

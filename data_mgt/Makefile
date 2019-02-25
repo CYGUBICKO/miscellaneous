@@ -28,7 +28,8 @@ $(ms)/Makefile:
 
 ######################################################################
 
-Sources += $(wildcard *.R *.rmd *.md)
+subdirs += ../funs
+Sources += $(wildcard *.R *.rmd *.md) $(subdirs)
 
 ## https://cygubicko.github.io/miscellaneous/separate_entries.html
 separate_entries.html.pages: separate_entries.rmd
