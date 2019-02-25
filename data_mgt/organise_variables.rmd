@@ -1,0 +1,48 @@
+---
+title: 'Organise Variables in a dataframe'
+author: "Steve Cygu ([cygubicko@gmail.com](mailto:cygubicko@gmail.com))"
+date: "2019 Feb 25 (Mon)"
+output:
+  html_document:
+   code_folding: show
+   number_sections: yes
+   toc: yes
+   toc_depth: 5
+   toc_float: yes
+---
+
+```{r setup, include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(echo = TRUE
+	, warning = FALSE
+	, message = FALSE
+	, fig.width = 10
+	, fig.height = 10
+	, results = "asis")
+options(width = 12)
+```
+
+# Setup
+
+We begin by loading the required packages. If you don't have the packages installed, use `install.packages("package_name")`.
+
+```{r, echo = TRUE}
+library(DT)
+library(dplyr)
+library(tidyr)
+```
+
+
+# Problem
+
+By default R appends any newly created variable at the end of the dataset. However, at time, we want to organise our dataset such that related variables (maybe by naming structure) follow each other or are in some kind of nest. This might not necessarily improve ease-to-analyse but it does improve human readerability and to some extent improve ease-to-manipulate. In some other cases, variable re(ordering) or organisation maybe necessitated by client request. 
+
+In this [post](https://cygubicko.github.io/miscellaneous/separate_entries.html), I wanted to make sure that variables which counted the number of selections per case was either created before the separated variables or followed immedialy after the split. I thought I could easily specify that in `mutate()` function or find some help online but here we are trying to figure it out together.
+
+In this post we implement a simple function that will help us accomplish the above tasks. In addition, to apply it to a datset, we use [social media survey data](https://github.com/CYGUBICKO/miscellaneous/tree/master/datasets) described in this [post](https://cygubicko.github.io/miscellaneous/separate_entries.html).
+
+```{r}
+desc <- read.csv("../datasets/multi_resp_desc.csv")
+datatable(desc, rownames = FALSE)
+```
+
+You can download the function from [here](https://github.com/CYGUBICKO/miscellaneous/tree/master/funs) or markdown file from [here](https://github.com/CYGUBICKO/miscellaneous/tree/master/data_mgt).

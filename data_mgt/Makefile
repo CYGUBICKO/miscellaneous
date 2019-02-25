@@ -31,9 +31,13 @@ $(ms)/Makefile:
 subdirs += ../funs
 Sources += $(wildcard *.R *.rmd *.md) $(subdirs)
 
+## Split multiple response column
+
 ## https://cygubicko.github.io/miscellaneous/separate_entries.html
 separate_entries.html.pages: separate_entries.rmd
 
+## Organise variables in a dataframe
+organise_variables.html.pages: organise_variables.rmd
 
 ######################################################################
 

@@ -226,4 +226,4 @@ smedia_df <- (smedia_df
 smedia_df
 ```
 
-You can download the function from [here]() or markdown file from [here]()
+You can download the function from [here](https://github.com/CYGUBICKO/miscellaneous/tree/master/funs) or markdown file from [here](https://github.com/CYGUBICKO/miscellaneous/tree/master/data_mgt).
