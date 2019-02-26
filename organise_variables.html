@@ -3872,8 +3872,45 @@ library(tidyr)</code></pre>
 <p>In this post we implement a simple function that will help us accomplish the above tasks. In addition, to apply it to a datset, we use <a href="https://github.com/CYGUBICKO/miscellaneous/tree/master/datasets">social media survey data</a> described in this <a href="https://cygubicko.github.io/miscellaneous/separate_entries.html">post</a>.</p>
 <pre class="r"><code>desc &lt;- read.csv(&quot;../datasets/multi_resp_desc.csv&quot;)
 datatable(desc, rownames = FALSE)</code></pre>
-<div id="htmlwidget-609377ac190093ae0072" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-609377ac190093ae0072">{"x":{"filter":"none","data":[["doi","gender","age","smedia_used","freq_usage","freq_post"],["1. Date of interview","2. What is your gender?","3. How old are you?","4. What social media platforms do you use regularly? (Select all that apply)","5. If you selected that you use Twitter, how often do you read Twitter content? (Select one)","6. If you selected that you use Twitter, how often do you post to Twitter?"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>variable<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-e89c8810b1dff7f444b9" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e89c8810b1dff7f444b9">{"x":{"filter":"none","data":[["doi","gender","age","smedia_used","freq_usage","freq_post"],["1. Date of interview","2. What is your gender?","3. How old are you?","4. What social media platforms do you use regularly? (Select all that apply)","5. If you selected that you use Twitter, how often do you read Twitter content? (Select one)","6. If you selected that you use Twitter, how often do you post to Twitter?"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>variable<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>organiseVars &lt;- function(df, move_vars, after = NULL, before = NULL){
+  
+  if(is.null(after) &amp; is.null(before)){
+    stop(&quot;You can not organise variables without specifying where to move them.&quot;)
+  }
+  
+  if (sum(after %in% move_vars) &gt; 0 | sum(before %in% move_vars) &gt; 0){
+    stop(&quot;You cannot move a variable within itself.&quot;)
+  }
+  
+  varnames &lt;- colnames(df)
+  temp_varnames &lt;- setdiff(varnames, move_vars)
+  if(is.null(after)){
+    new_order &lt;- c(move_vars, temp_varnames)
+  }
+  
+  if(is.null(before)){
+    new_order &lt;- c(temp_varnames, move_vars)
+  }
+  
+  if(!is.null(after) &amp; !is.null(before)){
+    left_indices &lt;- c(match(first(temp_varnames), temp_varnames):match(after, temp_varnames))
+    left_vars &lt;- varnames[left_indices]
+    right_indices &lt;- c(match(before, temp_varnames):match(last(temp_varnames), temp_varnames))
+    right_vars &lt;- varnames[right_indices]
+    new_order &lt;- c(left_vars, move_vars, right_vars)
+  }
+  
+  df &lt;- (df
+    %&gt;% select(new_order)
+  )
+  return(df)
+}</code></pre>
+<pre class="r"><code>mydata &lt;- read.csv(&quot;../datasets/multi_response.csv&quot;)
+mydata &lt;-(mydata
+  %&gt;% organiseVars(&quot;smedia_used&quot;, &quot;doi&quot;, before = NULL)
+)</code></pre>
 <p>You can download the function from <a href="https://github.com/CYGUBICKO/miscellaneous/tree/master/funs">here</a> or markdown file from <a href="https://github.com/CYGUBICKO/miscellaneous/tree/master/data_mgt">here</a>.</p>
 </div>
 
