@@ -37,6 +37,7 @@ Sources += $(wildcard *.R *.rmd *.md) $(subdirs)
 separate_entries.html.pages: separate_entries.rmd
 
 ## Organise variables in a dataframe
+## https://cygubicko.github.io/miscellaneous/organise_variables.html
 organise_variables.html.pages: organise_variables.rmd
 
 ######################################################################
