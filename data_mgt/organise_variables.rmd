@@ -104,9 +104,10 @@ moveVars <- function(df, move_vars, rightof = NULL, leftof = NULL, ends = c("fir
 ```
 
 
-Inputs:
 
 `moveVars()` moves variable(s) in a dataframe either to the left or right (in-between); or make them the first or last columns (end-point). 
+
+Inputs:
 
 > * `df` - is the input dataset
 > * `move_vars` - a vector of variables to move
