@@ -38,59 +38,160 @@ By default R appends any newly created variable at the end of the dataset. Howev
 
 In this [post](https://cygubicko.github.io/miscellaneous/separate_entries.html), I wanted to make sure that variables which counted the number of selections per case was either created before the separated variables or followed immedialy after the split. I thought I could easily specify that in `mutate()` function or find some help online but here we are trying to figure it out together.
 
-In this post we implement a simple function that will help us accomplish the above tasks. In addition, to apply it to a datset, we use [social media survey data](https://github.com/CYGUBICKO/miscellaneous/tree/master/datasets) described in this [post](https://cygubicko.github.io/miscellaneous/separate_entries.html).
-
-```{r}
-desc <- read.csv("../datasets/multi_resp_desc.csv")
-datatable(desc, rownames = FALSE)
-```
-
+In this post we implement a simple function that will help us accomplish the above tasks. 
 
 ```{r}
 
-organiseVars <- function(df, move_vars, after = NULL, before = NULL){
-  
-  if(is.null(after) & is.null(before)){
-    stop("You can not organise variables without specifying where to move them.")
-  }
-  
-  if (sum(after %in% move_vars) > 0 | sum(before %in% move_vars) > 0){
-    stop("You cannot move a variable within itself.")
-  }
+moveVars <- function(df, move_vars, rightof = NULL, leftof = NULL, ends = c("first", "last")){
   
   varnames <- colnames(df)
   temp_varnames <- setdiff(varnames, move_vars)
-  if(is.null(after)){
-    new_order <- c(move_vars, temp_varnames)
+  
+  if (missing(rightof) & missing(leftof) & !missing(ends)){
+    if (sum(c("first", "last") %in% ends) == 0){
+      stop("ends can only be either 'first' or 'last'")
+    }
+    if (sum("first" %in% ends) > 0){
+      new_order <- c(move_vars, temp_varnames)
+    }
+    if (sum("last" %in% ends) > 0){
+      new_order <- c(temp_varnames, move_vars)
+    }
+    df <- (df
+      %>% select(new_order)
+    )
+    return(df)
   }
   
-  if(is.null(before)){
-    new_order <- c(temp_varnames, move_vars)
+  else{
+    if(is.null(rightof) & is.null(leftof) & missing(ends)){
+      stop("You can not organise variables without specifying where to move them.")
+    }
+    
+    if (!rightof %in% varnames){
+      stop("Specified rightof variable not in the dataset")
+    }
+    
+    if (!leftof %in% varnames){
+      stop("Specified leftof variable not in the dataset")
+    }
+    if (sum(rightof %in% move_vars) > 0 | sum(leftof %in% move_vars) > 0){
+      stop("You cannot move a variable within itself.")
+    }
+    
+    if (is.null(rightof) & !is.null(leftof)){
+      stop("Specify rightof variable")
+    }
+    
+    if (!is.null(rightof) & is.null(leftof)){
+      stop("Specify leftof variable")
+    }
+    
+    if(!is.null(rightof) & !is.null(leftof)){
+      left_indices <- c(match(first(temp_varnames), temp_varnames):match(rightof, temp_varnames))
+      left_vars <- temp_varnames[left_indices]
+      right_vars <- setdiff(temp_varnames, left_vars)
+      right_vars <- c(leftof, setdiff(right_vars, leftof))
+      new_order <- c(left_vars, move_vars, right_vars)
+    }
+    df <- (df
+      %>% select(new_order)
+    )
+    return(df)
   }
-  
-  if(!is.null(after) & !is.null(before)){
-    left_indices <- c(match(first(temp_varnames), temp_varnames):match(after, temp_varnames))
-    left_vars <- varnames[left_indices]
-    right_indices <- c(match(before, temp_varnames):match(last(temp_varnames), temp_varnames))
-    right_vars <- varnames[right_indices]
-    new_order <- c(left_vars, move_vars, right_vars)
-  }
-  
-  df <- (df
-    %>% select(new_order)
-  )
-  return(df)
 }
-
 
 ```
 
 
+Inputs:
+
+`moveVars()` moves variable(s) in a dataframe either to the left or right (in-between); or make them the first or last columns (end-point). 
+
+> * `df` - is the input dataset
+> * `move_vars` - a vector of variables to move
+> * `rightof` -  variable to which the moved variable(s) will be to it's right
+> * `leftof` - variable to which the moved variable(s) will be to it's left
+> * `ends` - moves the variable(s) left most `(ends = "first")` or right most `(ends = "last")`
+
+Details:
+
+> If `rightof` and `leftof` are not specified, the function will try to use `ends` to move the variables. However, if all the `*_of` and `ends` are specified, by default the function will perform in-between movement. 
+
+Value:
+
+> Dataframe with shilfted varibales.
+
+# Example(s)
+
+To demonstrate this, we use [social media survey data](https://github.com/CYGUBICKO/miscellaneous/tree/master/datasets) described in this [post](https://cygubicko.github.io/miscellaneous/separate_entries.html).
+
+
 ```{r}
-mydata <- read.csv("../datasets/multi_response.csv")
-mydata <-(mydata
-  %>% organiseVars("smedia_used", "doi", before = NULL)
+smedia_df <- read.csv("../datasets/multi_response.csv")
+datatable(smedia_df, rownames = FALSE)
+```
+
+Move `smedia_used` and `age` to be the first variables.
+
+```{r}
+smedia_df <-(smedia_df
+  %>% moveVars(c("smedia_used", "age"), ends = "first")
 )
+datatable(smedia_df, rownames = FALSE)
+```
+
+Compare the output above and the original dataset and also try `ends = "last`.
+
+Suppose we want to move `"freq_usage"` and `"freq_post"` in-between `"doi"` and `"age"`. 
+
+```{r}
+smedia_df <-(smedia_df
+  %>% moveVars(c("freq_usage", "freq_post"), rightof = "doi", leftof = "age")
+)
+datatable(smedia_df, rownames = FALSE)
+```
+
+
+In the original dataset, `"doi"` and `"age"` are not adjascent to each other but `moveVars()` move `"freq_usage"` and `"freq_post"` and then make sure `"age"` comes after them.
+
+You might be wondering why would we go through the pain of writing such complicated function to simply shift variables!!! We will repeat the example for separating multiple response variables found [here](https://cygubicko.github.io/miscellaneous/separate_entries.html) (you can download the function from [here](https://github.com/CYGUBICKO/miscellaneous/tree/master/funs)).
+
+```{r}
+source("../funs/multiSeparate.R") # Download multiSeparate.R from the link above
+
+smedia_df <- (smedia_df
+ %>% mutate(smedia_used_dummy1 = smedia_used
+        , smedia_used_dummy2 = gsub(",", "-", smedia_used)
+ )
+)
+
+multi_vars <- grep("^smedia_used", colnames(smedia_df), value = TRUE)
+
+smedia_df <- (smedia_df
+    %>% multiSeparate(vars = multi_vars, pattern = ",|-", remove = FALSE, drop_ns = FALSE)
+)
+
+names(smedia_df)
+```
+
+From the output above, you notice that the variables are a bit all over. Suppose we want to organise the dataset such that we somehow preserve the order in the original dataset and also make sure we bring variables with similar names adjacent to one another. And now this where our function comes in.
+
+```{r}
+# The line below selects only variables related to smedia_used
+smedia_used_orig_vars <- grep("smedia_used$|smedia_used_n|smedia_used_[0-9]", colnames(smedia_df), value = TRUE)
+smedia_df <- (smedia_df
+  %>% moveVars(c("doi", "age", "gender"), ends = "first") # Move demographic variables to left most
+  %>% moveVars(smedia_used_orig_vars, rightof = "freq_post", leftof = "smedia_used_dummy1")
+  %>% moveVars("smedia_used_dummy1_nselected", rightof = "smedia_used_dummy1_6", leftof = "smedia_used_dummy2")
+)
+names(smedia_df)
+```
+
+And now we have every variable at the 'right' place.
+
+```{r}
+datatable(smedia_df, rownames = FALSE, options = list(scrollX = TRUE))
 ```
 
 
