@@ -21,7 +21,7 @@ summarizeDf <- function(df, output = c("simple", "tex"), digits = 1){
    	, Summary = rep(NA, length(vars))
 	)
   	for (i in 1:length(vars)){
-		vals <- working_df[, vars[[i]]]
+		vals <- df[, vars[[i]]]
     	if (class(vals) == "numeric" | class(vals) == "integer"){
 			df_summary[["Type"]][[i]] <- "numeric"
       	df_summary[["Variable"]][[i]] <- vars[[i]]
@@ -40,7 +40,7 @@ summarizeDf <- function(df, output = c("simple", "tex"), digits = 1){
       	if (missing(output) | sum(output %in% "simple") > 0){
 				perc <- paste0(names(perc), " (", perc, "%)")
 				df_summary[["Summary"]][[i]] <- paste0(perc
-					, collapse = ";\n "
+					, collapse = "; \n "
 				)
 			} else{
         		perc <- paste0(names(perc), " (", perc, "\\%)")

@@ -40,6 +40,9 @@ separate_entries.html.pages: separate_entries.rmd
 ## https://cygubicko.github.io/miscellaneous/organise_variables.html
 organise_variables.html.pages: organise_variables.rmd
 
+## Summarize variables variables in a dataframe
+## https://cygubicko.github.io/miscellaneous/summarize_variables.html
+summarize_variables.html.pages: summarize_variables.rmd
 
 ######################################################################
 
