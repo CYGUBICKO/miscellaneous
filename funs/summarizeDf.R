@@ -40,7 +40,7 @@ summarizeDf <- function(df, output = c("simple", "tex"), digits = 1){
       	if (missing(output) | sum(output %in% "simple") > 0){
 				perc <- paste0(names(perc), " (", perc, "%)")
 				df_summary[["Summary"]][[i]] <- paste0(perc
-					, collapse = "; \n "
+					, collapse = "; \n"
 				)
 			} else{
         		perc <- paste0(names(perc), " (", perc, "\\%)")
