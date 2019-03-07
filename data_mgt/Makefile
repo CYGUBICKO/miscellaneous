@@ -28,7 +28,7 @@ $(ms)/Makefile:
 
 ######################################################################
 
-subdirs += ../funs
+subdirs += ../funs/*.R
 Sources += $(wildcard *.R *.rmd *.md) $(subdirs)
 
 ## Split multiple response column
