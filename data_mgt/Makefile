@@ -19,7 +19,7 @@ Ignore += local.mk
 
 # -include $(ms)/perl.def
 
-Ignore += $(ms) .Rhistory
+Ignore += $(ms) 
 ## Sources += $(ms)
 Makefile: $(ms)/Makefile
 	touch $@
@@ -30,6 +30,7 @@ $(ms)/Makefile:
 
 subdirs += ../funs/*.R
 Sources += $(wildcard *.R *.rmd *.md) $(subdirs)
+Ignore += ../funs/*.Rhistory
 
 ## Split multiple response column
 
