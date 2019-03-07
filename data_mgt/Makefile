@@ -19,7 +19,7 @@ Ignore += local.mk
 
 # -include $(ms)/perl.def
 
-Ignore += $(ms)
+Ignore += $(ms) .Rhistory
 ## Sources += $(ms)
 Makefile: $(ms)/Makefile
 	touch $@
