@@ -28,7 +28,7 @@ $(ms)/Makefile:
 
 ######################################################################
 
-subdirs += ../funs/*.R
+subdirs += ../funs
 Sources += $(wildcard *.R *.rmd *.md) $(subdirs)
 Ignore += ../funs/*.Rhistory
 
