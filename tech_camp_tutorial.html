@@ -3975,8 +3975,8 @@ miss_df &lt;- (sapply(df, function(x){sum(is.na(x))})
 )
 
 miss_df</code></pre>
-<div id="htmlwidget-10b5fc05aea6352029e9" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-10b5fc05aea6352029e9">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-48d467ca9f11458c5567" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-48d467ca9f11458c5567">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>missFunc &lt;- function(df_frame){
   miss_df &lt;- (sapply(df_frame, function(x){sum(is.na(x))})
     %&gt;% data.frame()
@@ -3987,8 +3987,25 @@ miss_df</code></pre>
 }
 miss_summary &lt;- missFunc(df)
 datatable(miss_summary)</code></pre>
-<div id="htmlwidget-0e8ed3a54337c15e77f5" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-0e8ed3a54337c15e77f5">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-6d92f482b64efdf9f3dd" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6d92f482b64efdf9f3dd">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>## Create a new dataset df2 with a missing case to test missFunc
+df2 &lt;- (df
+  %&gt;% mutate(gender2 = ifelse(gender==&quot;Female&quot;, NA, gender))
+)
+
+# Check the missing in gender2
+missFunc(df2)</code></pre>
+<pre><code>variables</code></pre>
+<p>1 doi 2 gender 3 age 4 smedia_used 5 freq_usage 6 freq_post 7 gender2 No_miss 1 0 2 0 3 0 4 0 5 0 6 0 7 24</p>
+<pre class="r"><code>## Age
+df2 &lt;- (df
+  %&gt;% mutate(age2 = ifelse(age &gt; 25, NA, age))
+)
+
+missFunc(df2)</code></pre>
+<pre><code>variables</code></pre>
+<p>1 doi 2 gender 3 age 4 smedia_used 5 freq_usage 6 freq_post 7 age2 No_miss 1 0 2 0 3 0 4 0 5 0 6 0 7 2</p>
 </div>
 
 
