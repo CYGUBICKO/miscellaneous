@@ -1640,9 +1640,14 @@ pacman::p_load(pkgs, install = T, character.only = T)</code></pre>
 <li>Organise/Re-order variables</li>
 </ul>
 <p>Read data</p>
-<pre class="r"><code>files &lt;- list.files()
-pattern &lt;- &quot;multi_response.csv&quot;
-#read.csv(&quot;https://github.com/CYGUBICKO/miscellaneous/raw/master/datasets/multi_response.csv&quot;)</code></pre>
+<pre class="r"><code>file &lt;- list.files()
+patterns &lt;- &quot;multi_resp_desc.csv&quot;
+
+if (length(file)&gt;0 &amp; sum(grepl(patterns, file)) &gt; 0){
+  df &lt;- read.csv(patterns)
+} else {
+  df &lt;- read.csv(&quot;https://github.com/CYGUBICKO/miscellaneous/raw/master/datasets/multi_response.csv&quot;)
+}</code></pre>
 </div>
 
 
