@@ -3975,8 +3975,20 @@ miss_df &lt;- (sapply(df, function(x){sum(is.na(x))})
 )
 
 miss_df</code></pre>
-<div id="htmlwidget-afce1e1e76754c9038b4" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-afce1e1e76754c9038b4">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-10b5fc05aea6352029e9" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-10b5fc05aea6352029e9">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>missFunc &lt;- function(df_frame){
+  miss_df &lt;- (sapply(df_frame, function(x){sum(is.na(x))})
+    %&gt;% data.frame()
+    %&gt;% rownames_to_column(&quot;variables&quot;)
+    %&gt;% setnames(c(&quot;.&quot;), c(&quot;No_miss&quot;))
+  )
+  return(miss_df)
+}
+miss_summary &lt;- missFunc(df)
+datatable(miss_summary)</code></pre>
+<div id="htmlwidget-0e8ed3a54337c15e77f5" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0e8ed3a54337c15e77f5">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 
 
