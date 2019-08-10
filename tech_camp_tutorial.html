@@ -3975,8 +3975,8 @@ miss_df &lt;- (sapply(df, function(x){sum(is.na(x))})
 )
 
 miss_df</code></pre>
-<div id="htmlwidget-7978d743e75a24a35843" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-7978d743e75a24a35843">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-63d6ff7fff7eac5e35ad" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-63d6ff7fff7eac5e35ad">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>missFunc &lt;- function(df_frame){
   miss_df &lt;- (sapply(df_frame, function(x){sum(is.na(x))})
     %&gt;% data.frame()
@@ -3987,8 +3987,8 @@ miss_df</code></pre>
 }
 miss_summary &lt;- missFunc(df)
 datatable(miss_summary)</code></pre>
-<div id="htmlwidget-926c65ba7dcc557053a4" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-926c65ba7dcc557053a4">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-fde3fabd960cdfcd3dea" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-fde3fabd960cdfcd3dea">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>## Create a new dataset df2 with a missing case to test missFunc
 df2 &lt;- (df
   %&gt;% mutate(gender2 = ifelse(gender==&quot;Female&quot;, NA, gender))
@@ -4042,6 +4042,54 @@ for (i in 1:length(vars)){
 df_summary</code></pre>
 <pre><code>Variables</code></pre>
 <p>1 doi 2 gender 3 age 4 smedia_used 5 freq_usage 6 freq_post 7 age2 Type 1 Categorical 2 Categorical 3 numeric 4 Categorical 5 Categorical 6 Categorical 7 numeric Summary 1 <NA> 2 <NA> 3 <a href="2.04">19,28,22.05</a> 4 <NA> 5 <NA> 6 <NA> 7 <a href="1.69">19,25,21.78</a></p>
+<p>In this post, we implement a simple function which entirely depends on base R to generate a more flexible variable(s) summary object.</p>
+<pre class="r"><code>summarizeDf &lt;- function(df, output = c(&quot;simple&quot;, &quot;tex&quot;), digits = 1){
+    if (!missing(output) &amp; sum(!output %in% c(&quot;simple&quot;, &quot;tex&quot;)) &gt; 0){
+      stop(&quot;output can only be &#39;simple&#39; or &#39;tex&#39;&quot;)
+   }
+   vars &lt;- colnames(df)
+   df_summary &lt;- data.frame(Variable = rep(NA, length(vars))
+      , Type = rep(NA, length(vars))
+      , Summary = rep(NA, length(vars))
+   )
+   for (i in 1:length(vars)){
+      vals &lt;- df[, vars[[i]]]
+      if (class(vals) == &quot;numeric&quot; | class(vals) == &quot;integer&quot;){
+         df_summary[[&quot;Type&quot;]][[i]] &lt;- &quot;numeric&quot;
+         df_summary[[&quot;Variable&quot;]][[i]] &lt;- vars[[i]]
+         df_summary[[&quot;Summary&quot;]][[i]] &lt;- paste0(&quot;[&quot;
+            , round(min(vals), digits), &quot;, &quot;
+            , round(max(vals), digits), &quot;]; &quot;
+            , round(mean(vals), digits), &quot; (&quot;
+            , round(sd(vals), digits), &quot;)&quot;
+         )
+      } else{
+         df_summary[[&quot;Type&quot;]][[i]] &lt;- &quot;categorical&quot;
+         df_summary[[&quot;Variable&quot;]][[i]] &lt;- vars[[i]]
+         perc &lt;- sort(round(prop.table(table(vals))*100, digits)
+            , decreasing = TRUE
+         )
+         if (missing(output) | sum(output %in% &quot;simple&quot;) &gt; 0){
+            perc &lt;- paste0(names(perc), &quot; (&quot;, perc, &quot;%)&quot;)
+            df_summary[[&quot;Summary&quot;]][[i]] &lt;- paste0(perc
+               , collapse = &quot;;\n &quot;
+            )
+         } else{
+            perc &lt;- paste0(names(perc), &quot; (&quot;, perc, &quot;\\%)&quot;)
+            df_summary[[&quot;Summary&quot;]][[i]] &lt;- paste0(perc
+               , collapse = &quot;; \\\\ &amp; &amp; &quot;
+            )
+         }
+      }
+   }
+   return(df_summary)
+}
+
+df_summary &lt;- (df2
+    %&gt;% select(-doi)
+    %&gt;% summarizeDf(&quot;simple&quot;, 2)
+    %&gt;% datatable()
+)</code></pre>
 </div>
 
 
