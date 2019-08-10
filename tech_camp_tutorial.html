@@ -1627,9 +1627,12 @@ div.tocify {
 
 <div id="setup" class="section level1">
 <h1><span class="header-section-number">1</span> Setup</h1>
-<pre class="r"><code>library(xtable)
-library(DT)
-library(dplyr)</code></pre>
+<pre class="r"><code>pkgs &lt;- c(&quot;xtable&quot;, &quot;DT&quot;, &quot;dplyr&quot;     # Reading and saving data
+)
+if (!&quot;pacman&quot; %in% installed.packages()[,1]){
+  install.packages(&quot;pacman&quot;)
+}
+pacman::p_load(pkgs, install = T, character.only = T)</code></pre>
 <p>Focus will be on… but we can also think through some other problems!!!</p>
 <ul>
 <li>Summariz(s) variables in a data frame</li>
