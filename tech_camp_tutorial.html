@@ -3975,8 +3975,8 @@ miss_df &lt;- (sapply(df, function(x){sum(is.na(x))})
 )
 
 miss_df</code></pre>
-<div id="htmlwidget-6abba217efcbb4774099" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-6abba217efcbb4774099">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-7978d743e75a24a35843" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7978d743e75a24a35843">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>missFunc &lt;- function(df_frame){
   miss_df &lt;- (sapply(df_frame, function(x){sum(is.na(x))})
     %&gt;% data.frame()
@@ -3987,8 +3987,8 @@ miss_df</code></pre>
 }
 miss_summary &lt;- missFunc(df)
 datatable(miss_summary)</code></pre>
-<div id="htmlwidget-29f5a760e36bb1a1f4cc" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-29f5a760e36bb1a1f4cc">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-926c65ba7dcc557053a4" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-926c65ba7dcc557053a4">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>## Create a new dataset df2 with a missing case to test missFunc
 df2 &lt;- (df
   %&gt;% mutate(gender2 = ifelse(gender==&quot;Female&quot;, NA, gender))
@@ -4013,7 +4013,8 @@ missFunc(df2)</code></pre>
 <div id="problem" class="section level1">
 <h1><span class="header-section-number">3</span> Problem</h1>
 <p>There are many functions or packages which summarizes variables in a data frame. However, there seem not to offer so much flexibility on how much one can manipute or export the output, for instance, including outputs in .tex files.</p>
-<pre class="r"><code>vars &lt;- names(df2)
+<pre class="r"><code>#### ---- DF summary ----
+vars &lt;- names(df2)
 df_summary &lt;- data.frame(Variables = rep(NA, length(vars))
   , Type = rep(NA, length(vars))
   , Summary = rep(NA, length(vars))
@@ -4027,14 +4028,20 @@ for (i in 1:length(vars)){
     df_summary[[&quot;Type&quot;]][[i]] &lt;- &quot;Categorical&quot;
   } else {
     df_summary[[&quot;Type&quot;]][[i]] &lt;- &quot;numeric&quot;
-    df_summary[[&quot;Summary&quot;]][i] &lt;- paste0(&quot;[&quot;, round(mean(vals, na.rm = TRUE), digits = digs), &quot;]&quot;
-
+    df_summary[[&quot;Summary&quot;]][i] &lt;- paste0(&quot;[&quot; 
+      , round(min(vals, na.rm = TRUE), digits = digs), &quot;,&quot;
+      , round(max(vals, na.rm = TRUE), digits = digs), &quot;,&quot;
+      , round(mean(vals, na.rm = TRUE), digits = digs)
+    , &quot;]&quot;
+    , &quot;(&quot;
+    ,  round(sd(vals, na.rm = TRUE), digits = digs)
+    , &quot;)&quot;
     )
   }
 }
 df_summary</code></pre>
 <pre><code>Variables</code></pre>
-<p>1 doi 2 gender 3 age 4 smedia_used 5 freq_usage 6 freq_post 7 age2 Type 1 Categorical 2 Categorical 3 numeric 4 Categorical 5 Categorical 6 Categorical 7 numeric Summary 1 <NA> 2 <NA> 3 [22.05] 4 <NA> 5 <NA> 6 <NA> 7 [21.78]</p>
+<p>1 doi 2 gender 3 age 4 smedia_used 5 freq_usage 6 freq_post 7 age2 Type 1 Categorical 2 Categorical 3 numeric 4 Categorical 5 Categorical 6 Categorical 7 numeric Summary 1 <NA> 2 <NA> 3 <a href="2.04">19,28,22.05</a> 4 <NA> 5 <NA> 6 <NA> 7 <a href="1.69">19,25,21.78</a></p>
 </div>
 
 
