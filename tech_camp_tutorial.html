@@ -3975,8 +3975,8 @@ miss_df &lt;- (sapply(df, function(x){sum(is.na(x))})
 )
 
 miss_df</code></pre>
-<div id="htmlwidget-48d467ca9f11458c5567" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-48d467ca9f11458c5567">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-c48f80e8c29d19ff3514" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c48f80e8c29d19ff3514">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>missFunc &lt;- function(df_frame){
   miss_df &lt;- (sapply(df_frame, function(x){sum(is.na(x))})
     %&gt;% data.frame()
@@ -3987,8 +3987,8 @@ miss_df</code></pre>
 }
 miss_summary &lt;- missFunc(df)
 datatable(miss_summary)</code></pre>
-<div id="htmlwidget-6d92f482b64efdf9f3dd" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-6d92f482b64efdf9f3dd">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-54d7592e894c70aaaa8d" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-54d7592e894c70aaaa8d">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["doi","gender","age","smedia_used","freq_usage","freq_post"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>variables<\/th>\n      <th>No_miss<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>## Create a new dataset df2 with a missing case to test missFunc
 df2 &lt;- (df
   %&gt;% mutate(gender2 = ifelse(gender==&quot;Female&quot;, NA, gender))
@@ -4006,6 +4006,13 @@ df2 &lt;- (df
 missFunc(df2)</code></pre>
 <pre><code>variables</code></pre>
 <p>1 doi 2 gender 3 age 4 smedia_used 5 freq_usage 6 freq_post 7 age2 No_miss 1 0 2 0 3 0 4 0 5 0 6 0 7 2</p>
+<div id="summarize-dataframes" class="section level2">
+<h2><span class="header-section-number">2.1</span> Summarize dataframes</h2>
+</div>
+</div>
+<div id="problem" class="section level1">
+<h1><span class="header-section-number">3</span> Problem</h1>
+<p>There are many functions or packages which summarizes variables in a data frame. However, there seem not to offer so much flexibility on how much one can manipute or export the output, for instance, including outputs in .tex files.</p>
 </div>
 
 
