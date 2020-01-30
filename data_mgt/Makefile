@@ -45,6 +45,9 @@ organise_variables.html.pages: organise_variables.rmd
 ## https://cygubicko.github.io/miscellaneous/summarize_variables.html
 summarize_variables.html.pages: summarize_variables.rmd
 
+## Tutorials to tech camp students
+tech_camp_tutorial.html: tech_camp_tutorial.rmd
+
 ######################################################################
 
 clean: 

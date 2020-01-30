@@ -26,13 +26,61 @@ summarizeDf <- function(df, output = c("simple", "tex"), digits = 1){
 			df_summary[["Type"]][[i]] <- "numeric"
       	df_summary[["Variable"]][[i]] <- vars[[i]]
       	df_summary[["Summary"]][[i]] <- paste0("["
-				, round(min(vals), digits), ", "
-				, round(max(vals), digits), "]; "
-        		, round(mean(vals), digits), " ("
-				, round(sd(vals), digits), ")"
+				, round(min(vals, na.rm = TRUE), digits), ", "
+				, round(max(vals, na.rm = TRUE), digits), "]; "
+        		, round(mean(vals, na.rm = TRUE), digits), " ("
+				, round(sd(vals, na.rm = TRUE), digits), ")"
 			)
 		} else{
 			df_summary[["Type"]][[i]] <- "categorical"
+      	df_summary[["Variable"]][[i]] <- vars[[i]]
+      	perc <- sort(round(prop.table(table(vals))*100, digits)
+				, decreasing = TRUE
+			)
+      	if (missing(output) | sum(output %in% "simple") > 0){
+				perc <- paste0(names(perc), " (", perc, "%)")
+				df_summary[["Summary"]][[i]] <- paste0(perc
+					, collapse = "; \n"
+				)
+			} else{
+        		perc <- paste0(names(perc), " (", perc, "\\%)")
+        		df_summary[["Summary"]][[i]] <- paste0(perc
+					, collapse = "; \\\\  & & "
+				)
+			}
+		}
+	}
+	return(df_summary)
+}
+
+## Include variable descriptions
+
+summarizeDf2 <- function(df, output = c("simple", "tex"), digits = 1, labs_df){
+	if (!missing(output) & sum(!output %in% c("simple", "tex")) > 0){
+		stop("output can only be 'simple' or 'tex'")
+	}
+  	vars <- colnames(df)
+  	df_summary <- data.frame(Variable = rep(NA, length(vars))
+		, Description = rep(NA, length(vars))
+   	, Type = rep(NA, length(vars))
+   	, Summary = rep(NA, length(vars))
+	)
+  	for (i in 1:length(vars)){
+		labs <- as.character(labs_df$labels[labs_df$var %in% vars[i]])
+		vals <- df[, vars[[i]]]
+    	if (class(vals) == "numeric" | class(vals) == "integer"){
+			df_summary[["Type"]][[i]] <- "numeric"
+      	df_summary[["Description"]][[i]] <- labs
+      	df_summary[["Variable"]][[i]] <- vars[[i]]
+      	df_summary[["Summary"]][[i]] <- paste0("["
+				, round(min(vals, na.rm = TRUE), digits), ", "
+				, round(max(vals, na.rm = TRUE), digits), "]; "
+        		, round(mean(vals, na.rm = TRUE), digits), " ("
+				, round(sd(vals, na.rm = TRUE), digits), ")"
+			)
+		} else{
+			df_summary[["Type"]][[i]] <- "categorical"
+      	df_summary[["Description"]][[i]] <- labs
       	df_summary[["Variable"]][[i]] <- vars[[i]]
       	perc <- sort(round(prop.table(table(vals))*100, digits)
 				, decreasing = TRUE
