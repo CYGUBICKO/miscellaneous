@@ -24,8 +24,21 @@ Ignore += $(subdirs)
 
 ######################################################################
 
-### Makestuff rules
+# https://cygubicko.github.io/miscellaneous
+index.html.pages: index.html
 
+######################################################################
+
+Ignore += *.rda
+Ignore += *.Rhistory
+Ignore += *.pdf *.html *.csv *.vrb *.png *.Rexit
+
+######################################################################
+
+### Makestuff
+
+-include $(ms)/texdeps.mk
+-include $(ms)/pandoc.mk
 -include $(ms)/git.mk
 -include $(ms)/visual.mk
 
