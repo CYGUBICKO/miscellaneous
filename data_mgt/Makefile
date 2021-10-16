@@ -48,6 +48,9 @@ summarize_variables.html.pages: summarize_variables.rmd
 ## Tutorials to tech camp students
 tech_camp_tutorial.html: tech_camp_tutorial.rmd
 
+## Beautiful pic
+sierpiriski_triangle.Rout: sierpiriski_triangle.R
+
 ######################################################################
 
 clean: 

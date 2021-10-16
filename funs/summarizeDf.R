@@ -93,7 +93,7 @@ summarizeDf2 <- function(df, output = c("simple", "tex"), digits = 1, labs_df){
 			} else{
         		perc <- paste0(names(perc), " (", perc, "\\%)")
         		df_summary[["Summary"]][[i]] <- paste0(perc
-					, collapse = "; \\\\  & & "
+					, collapse = "; \\\\  & & & "
 				)
 			}
 		}
