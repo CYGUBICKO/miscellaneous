@@ -27,7 +27,7 @@ Ignore += $(subdirs)
 # https://cygubicko.github.io/miscellaneous
 index.html.pages: index.html
 
-steve_cv.pdf:
+updated_cv:
 	cp ~/grive/McMaster/Docs/CV-Aphrc/steve_cv.pdf .
 
 steve_cv.pdf.pages: steve_cv.pdf
